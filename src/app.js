@@ -37,10 +37,10 @@ const getPdf = async (html) => {
     format: 'A4',
     printBackground: true,
     margin: {
-      top: '20px',
-      right: '20px',
-      bottom: '20px',
-      left: '20px'
+      top: '30px',
+      right: '30px',
+      bottom: '30px',
+      left: '30px'
     }
   });
   await browser.close();
