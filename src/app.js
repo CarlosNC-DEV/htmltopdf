@@ -15,73 +15,95 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 const getPdf = async (html) => {
   let browser = null;
-  if (NODE_ENV === 'development') {
-    console.log('Development browser: ');
-    browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true,
-    });
-  }
-  if (NODE_ENV === 'production') {
-    console.log('Production browser: ');
-    browser = await puppeteerCore.launch({
-      args: [...chromium.args, '--no-sandbox'],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: "new",
-      ignoreHTTPSErrors: true,
-    });
-  }
-  const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: 'networkidle0' });
-  const pdfBuffer = await page.pdf({
-    format: 'A4',
-    printBackground: true,
-    margin: {
-      top: '94px',
-      right: '94px',
-      bottom: '94px',
-      left: '94px'
+  try {
+    if (NODE_ENV === 'development') {
+      console.log('Development browser: ');
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true,
+      });
+    } else {
+      console.log('Production browser: ');
+      // Configuración específica para entornos serverless
+      chromium.setHeadlessMode = true;
+      chromium.setGraphicsMode = false;
+      
+      browser = await puppeteerCore.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath({
+          useChromium: true
+        }),
+        ignoreHTTPSErrors: true
+      });
     }
-  });
-  await browser.close();
-  return pdfBuffer;
+    
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '94px',
+        right: '94px',
+        bottom: '94px',
+        left: '94px'
+      }
+    });
+    return pdfBuffer;
+  } catch (error) {
+    console.error('Error en getPdf:', error);
+    throw error;
+  } finally {
+    if (browser) await browser.close();
+  }
 };
 
 const getPdfLabel = async (html) => {
   let browser = null;
-  if (NODE_ENV === 'development') {
-    console.log('Development browser: ');
-    browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true,
-    });
-  }
-  if (NODE_ENV === 'production') {
-    console.log('Production browser: ');
-    browser = await puppeteerCore.launch({
-      args: [...chromium.args, '--no-sandbox'],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: "new",
-      ignoreHTTPSErrors: true,
-    });
-  }
-  const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: 'networkidle0' });
-  const pdfBuffer = await page.pdf({
-    format: 'A4',
-    landscape: true,
-    printBackground: true,
-    margin: {
-      top: '9px',
-      right: '9px',
-      bottom: '9px',
-      left: '9px'
+  try {
+    if (NODE_ENV === 'development') {
+      console.log('Development browser: ');
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true,
+      });
+    } else {
+      console.log('Production browser: ');
+      // Configuración específica para entornos serverless
+      chromium.setHeadlessMode = true;
+      chromium.setGraphicsMode = false;
+      
+      browser = await puppeteerCore.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath({
+          useChromium: true
+        }),
+        ignoreHTTPSErrors: true
+      });
     }
-  });
-  await browser.close();
-  return pdfBuffer;
+    
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      landscape: true,
+      printBackground: true,
+      margin: {
+        top: '9px',
+        right: '9px',
+        bottom: '9px',
+        left: '9px'
+      }
+    });
+    return pdfBuffer;
+  } catch (error) {
+    console.error('Error en getPdfLabel:', error);
+    throw error;
+  } finally {
+    if (browser) await browser.close();
+  }
 };
 
 app.post('/html-to-pdf', async (req, res) => {
