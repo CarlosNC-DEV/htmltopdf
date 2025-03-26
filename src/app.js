@@ -25,15 +25,13 @@ const getPdf = async (html) => {
     } else {
       console.log('Production browser: ');
       // Configuración específica para entornos serverless
-      chromium.setHeadlessMode = true;
-      chromium.setGraphicsMode = false;
+      await chromium.font('https://raw.githack.com/googlei18n/noto-emoji/master/fonts/NotoColorEmoji.ttf');
       
       browser = await puppeteerCore.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath({
-          useChromium: true
-        }),
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
         ignoreHTTPSErrors: true
       });
     }
