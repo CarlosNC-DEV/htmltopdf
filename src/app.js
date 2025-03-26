@@ -25,10 +25,11 @@ const getPdf = async (html) => {
   if (NODE_ENV === 'production') {
     console.log('Production browser: ');
     browser = await puppeteerCore.launch({
-      args: chromium.args,
+      args: [...chromium.args, '--no-sandbox'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: "new",
+      ignoreHTTPSErrors: true,
     });
   }
   const page = await browser.newPage();
@@ -59,10 +60,11 @@ const getPdfLabel = async (html) => {
   if (NODE_ENV === 'production') {
     console.log('Production browser: ');
     browser = await puppeteerCore.launch({
-      args: chromium.args,
+      args: [...chromium.args, '--no-sandbox'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: "new",
+      ignoreHTTPSErrors: true,
     });
   }
   const page = await browser.newPage();
