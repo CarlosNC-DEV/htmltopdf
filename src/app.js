@@ -33,10 +33,10 @@ const getPdf = async (html, customOptions = null) => {
         defaultViewport: chromium.defaultViewport
       });
     }
-    
+
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
-    
+
     // Opciones predeterminadas
     const defaultOptions = {
       format: 'A4',
@@ -48,10 +48,10 @@ const getPdf = async (html, customOptions = null) => {
         left: '94px'
       }
     };
-    
+
     // Usar opciones personalizadas si se proporcionan
     const pdfOptions = customOptions || defaultOptions;
-    
+
     const pdfBuffer = await page.pdf(pdfOptions);
     return pdfBuffer;
   } catch (error) {
@@ -73,8 +73,15 @@ app.post('/html-to-pdf', async (req, res) => {
     const pdfBuffer = await getPdf(html);
 
     res.contentType('application/pdf');
-    res.send(pdfBuffer);
-
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+      'Content-Disposition': 'attachment; filename="documento.pdf"',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    res.end(pdfBuffer);
   } catch (error) {
     console.error('Error al generar PDF:', error);
     res.status(500).send('Error al generar PDF: ' + error.message);
@@ -94,18 +101,23 @@ app.post('/htmlpdflabelmatpel', async (req, res) => {
       landscape: true,
       printBackground: true,
       margin: {
-        top: '9px',
-        right: '9px',
-        bottom: '9px',
-        left: '9px'
+        top: '10px',
+        right: '10px',
+        bottom: '10px',
+        left: '10px'
       }
     };
 
     const pdfBuffer = await getPdf(html, customOptions);
-
-    res.contentType('application/pdf');
-    res.send(pdfBuffer);
-
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+      'Content-Disposition': 'attachment; filename="documento.pdf"',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    res.end(pdfBuffer);
   } catch (error) {
     console.error('Error al generar PDF:', error);
     res.status(500).send('Error al generar PDF: ' + error.message);
