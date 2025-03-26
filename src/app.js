@@ -72,10 +72,10 @@ const getPdfLabel = async (html) => {
     landscape: true,
     printBackground: true,
     margin: {
-      top: '10px',
-      right: '10px',
-      bottom: '10px',
-      left: '10px'
+      top: '9px',
+      right: '9px',
+      bottom: '9px',
+      left: '9px'
     }
   });
   await browser.close();
