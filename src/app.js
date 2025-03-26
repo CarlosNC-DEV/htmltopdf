@@ -97,14 +97,13 @@ app.post('/htmlpdflabelmatpel', async (req, res) => {
     }
 
     const customOptions = {
-      format: 'A4',
       landscape: true,
       printBackground: true,
       margin: {
-        top: '10px',
-        right: '10px',
-        bottom: '10px',
-        left: '10px'
+        top: '5px',
+        right: '5px',
+        bottom: '5px',
+        left: '5px'
       }
     };
 
