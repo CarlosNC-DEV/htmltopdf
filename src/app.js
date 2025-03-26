@@ -47,6 +47,41 @@ const getPdf = async (html) => {
   return pdfBuffer;
 };
 
+const getPdfLabel = async (html) => {
+  let browser = null;
+  if (NODE_ENV === 'development') {
+    console.log('Development browser: ');
+    browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true,
+    });
+  }
+  if (NODE_ENV === 'production') {
+    console.log('Production browser: ');
+    browser = await puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+  }
+  const page = await browser.newPage();
+  await page.setContent(html, { waitUntil: 'networkidle0' });
+  const pdfBuffer = await page.pdf({
+    format: 'A4',
+    landscape: true,
+    printBackground: true,
+    margin: {
+      top: '10px',
+      right: '10px',
+      bottom: '10px',
+      left: '10px'
+    }
+  });
+  await browser.close();
+  return pdfBuffer;
+};
+
 app.post('/html-to-pdf', async (req, res) => {
   try {
     const { html } = req.body;
@@ -56,6 +91,25 @@ app.post('/html-to-pdf', async (req, res) => {
     }
 
     const pdfBuffer = await getPdf(html);
+
+    res.contentType('application/pdf');
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+    res.status(500).send('Error al generar PDF: ' + error.message);
+  }
+});
+
+app.post('/htmlpdflabelmatpel', async (req, res) => {
+  try {
+    const { html } = req.body;
+
+    if (!html) {
+      return res.status(400).send('No se proporcionó HTML');
+    }
+
+    const pdfBuffer = await getPdfLabel(html);
 
     res.contentType('application/pdf');
     res.send(pdfBuffer);
