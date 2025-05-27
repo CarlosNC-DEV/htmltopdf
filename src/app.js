@@ -123,4 +123,39 @@ app.post('/htmlpdflabelmatpel', async (req, res) => {
   }
 });
 
+app.post('/htmlpdfpesv', async (req, res) => {
+  try {
+    const { html } = req.body;
+
+    if (!html) {
+      return res.status(400).send('No se proporcionó HTML');
+    }
+
+    const customOptions = {
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '15px',
+        right: '15px',
+        bottom: '15px',
+        left: '15px'
+      }
+    };
+
+    const pdfBuffer = await getPdf(html, customOptions);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+      'Content-Disposition': 'attachment; filename="documento.pdf"',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    res.end(pdfBuffer);
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+    res.status(500).send('Error al generar PDF: ' + error.message);
+  }
+});
+
 export default app;
