@@ -9,9 +9,31 @@ import { NODE_ENV, PORT } from './config.js'
 const app = express();
 
 app.use(morgan("dev"));
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// CORS completamente abierto - permite TODO
+app.use(cors({
+  origin: '*',
+  methods: '*',
+  allowedHeaders: '*',
+  credentials: false
+}));
+
+// Middleware adicional para asegurar que CORS esté abierto
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
+// Aumentar límite para JSON grandes
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 // Versión actualizada basada en el artículo
 const getPdf = async (html, customOptions = null) => {
